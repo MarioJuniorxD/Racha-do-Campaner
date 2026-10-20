@@ -985,21 +985,7 @@ app.put("/api/trocar-senha", async (req, res) => {
     res.status(500).json({ erro: "Não foi possível alterar a senha." });
   }
 });
-// 🚨 ROTA TEMPORÁRIA DE EMERGÊNCIA
-app.get("/api/emergencia-corrigir-admins", async (req, res) => {
-  try {
-    // 1. Remove a flag de admin de TODO MUNDO
-    db.prepare("UPDATE jogadores SET admin = 0").run();
 
-    // 2. Define o Eduardo como admin (pelo telefone dele)
-    db.prepare("UPDATE jogadores SET admin = 1 WHERE telefone = '43998665378'").run();
-    // ⚠️ IMPORTANTE: troca '43998665378' pelo telefone REAL do Eduardo
-
-    res.send("Admins corrigidos! Apenas o Eduardo é admin agora.");
-  } catch (erro) {
-    res.status(500).send("Erro: " + erro.message);
-  }
-});
 // =====================================================
 // INICIAR SERVIDOR
 // =====================================================
