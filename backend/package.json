@@ -1,0 +1,15 @@
+{
+  "name": "futebol-empresa-backend",
+  "version": "1.0.0",
+  "description": "API do sistema Futebol da Empresa",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.1.0"
+  }
+}

@@ -1,0 +1,1087 @@
+/* =====================================================
+   RESET E BASE
+   ===================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #F5F5F5;
+  color: #1A1A1A;
+  font-size: 18px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* =====================================================
+   TELAS (login, cadastro, app)
+   ===================================================== */
+.tela {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   HEADER / TOPO
+   ===================================================== */
+.topo {
+  background: #0A3161;
+  color: #FFFFFF;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.topo > div {
+  max-width: 760px;
+  margin: auto;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Brasão no header */
+.topo .icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  font-size: 28px;
+  background: url("/img/brasao.jpg") center/contain no-repeat;
+  /* fallback: se a imagem não carregar, mostra a bola */
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 0 0 2px #F4C430;
+}
+
+.topo strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Botão sair no header */
+.btn-sair {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #F4C430;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-sair:hover {
+  background: #F4C430;
+  color: #0A3161;
+}
+
+/* =====================================================
+   CONTAINER PRINCIPAL
+   ===================================================== */
+.container {
+  width: min(760px, 94%);
+  margin: 25px auto;
+  flex: 1;
+  padding-bottom: 30px;
+}
+
+/* =====================================================
+   BOAS-VINDAS
+   ===================================================== */
+.boas-vindas {
+  margin-bottom: 24px;
+}
+
+.boas-vindas h1 {
+  font-size: 32px;
+  color: #0A3161;
+  margin-bottom: 6px;
+  font-weight: 800;
+}
+
+.boas-vindas p {
+  color: #555;
+  font-size: 17px;
+}
+
+/* =====================================================
+   CARDS
+   ===================================================== */
+.card {
+  background: #FFFFFF;
+  padding: 24px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(10, 49, 97, 0.08);
+  border-top: 4px solid #F4C430;
+}
+
+.card.destaque {
+  border-top-color: #C8102E;
+}
+
+.card h2 {
+  color: #0A3161;
+  font-size: 22px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+/* =====================================================
+   FORMULÁRIOS (login, cadastro)
+   ===================================================== */
+.card label {
+  display: block;
+  font-weight: 600;
+  color: #0A3161;
+  margin-bottom: 6px;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.card label:first-of-type {
+  margin-top: 0;
+}
+
+.card input[type="text"],
+.card input[type="tel"],
+.card input[type="password"],
+.card input[type="email"] {
+  display: block;
+  width: 100%;
+  padding: 16px 18px;
+  font-size: 18px;
+  border: 2px solid #E0E0E0;
+  border-radius: 14px;
+  background: #FAFAFA;
+  color: #1A1A1A;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.card input:focus {
+  outline: none;
+  border-color: #C8102E;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.12);
+}
+
+.card input::placeholder {
+  color: #999;
+}
+
+/* =====================================================
+   BOTÕES
+   ===================================================== */
+.acoes {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn,
+.menu-btn {
+  min-height: 60px;
+  border: 0;
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:focus,
+.menu-btn:focus {
+  outline: 4px solid #F4C430;
+  outline-offset: 2px;
+}
+
+/* Botão principal (ENTRAR / VOU JOGAR) */
+.btn-principal {
+  background: #C8102E;
+  color: #FFFFFF;
+  box-shadow: 0 4px 0 #8B0B1F;
+}
+
+.btn-principal:hover {
+  background: #E01135;
+  box-shadow: 0 4px 0 #8B0B1F;
+}
+
+.btn-principal:active {
+  box-shadow: 0 1px 0 #8B0B1F;
+  transform: translateY(3px) scale(0.99);
+}
+
+/* Botão secundário (NÃO VOU) */
+.btn-secundario {
+  background: #F4C430;
+  color: #0A3161;
+  box-shadow: 0 4px 0 #B8951F;
+}
+
+.btn-secundario:hover {
+  background: #FFD447;
+}
+
+.btn-secundario:active {
+  box-shadow: 0 1px 0 #B8951F;
+  transform: translateY(3px) scale(0.99);
+}
+
+/* =====================================================
+   MENSAGENS DE ERRO / SUCESSO
+   ===================================================== */
+.mensagem {
+  font-weight: 600;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.mensagem-erro {
+  color: #C8102E;
+  font-weight: 600;
+  margin-top: 14px;
+  font-size: 16px;
+  min-height: 20px;
+}
+
+/* =====================================================
+   LINK ALTERNATIVO (Cadastre-se / Entrar)
+   ===================================================== */
+.link-alternativo {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+  font-size: 16px;
+}
+
+.link-alternativo a {
+  color: #C8102E;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 2px solid #F4C430;
+  padding-bottom: 2px;
+}
+
+.link-alternativo a:hover {
+  color: #8B0B1F;
+  border-bottom-color: #C8102E;
+}
+
+/* =====================================================
+   LISTA DE JOGADORES
+   ===================================================== */
+.jogador {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #EEE;
+  font-size: 17px;
+}
+
+.jogador:last-child {
+  border-bottom: none;
+}
+
+.jogador span:first-child {
+  font-weight: 600;
+  color: #0A3161;
+}
+
+/* =====================================================
+   MENU GRID (Jogos / Jogadores / Pagamentos / Avisos)
+   ===================================================== */
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.menu-btn {
+  background: #FFFFFF;
+  color: #0A3161;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border-top: 4px solid #F4C430;
+  box-shadow: 0 3px 8px rgba(10, 49, 97, 0.08);
+}
+
+.menu-btn span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.menu-btn:hover {
+  background: #FFF8E1;
+  border-top-color: #C8102E;
+}
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+footer {
+  text-align: center;
+  padding: 30px 20px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* =====================================================
+   RESPONSIVO (celular)
+   ===================================================== */
+
+   /* Brasão no header */
+.brasao-header {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin-left: auto;
+  margin-right: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+/* Botão ADM no header */
+.btn-adm {
+  background: #F4C430;
+  color: #0A3161;
+  border: 2px solid #FFFFFF;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-adm:hover {
+  background: #FFD447;
+  transform: scale(1.05);
+}
+
+/* Quando o botão ADM tá visível, o brasão perde o margin-left: auto */
+.btn-adm[style*="display: inline-block"] + .brasao-header {
+  margin-left: 10px;
+}
+/* Dica sobre a data do jogo */
+.dica-data {
+  background: #FFF8E1;
+  border-left: 4px solid #F4C430;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #555;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+/* Aviso de mensalidade (informativo) */
+.aviso-mensalidade {
+  background: #FFF8E1;
+  border-left: 4px solid #F4C430;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #555;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.aviso-mensalidade strong {
+  color: #0A3161;
+  font-size: 17px;
+}
+/* Cards de jogos agendados */
+.jogo-card {
+  background: #FFFFFF;
+  padding: 20px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(10, 49, 97, 0.08);
+  border-top: 4px solid #F4C430;
+}
+
+.jogo-card .linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.jogo-card .linha:first-child {
+  font-weight: 700;
+  color: #0A3161;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.icone-extra {
+  color: #C8102E;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.jogo-card .btn-cancelar {
+  width: 100%;
+  margin-top: 12px;
+  background: #FFFFFF;
+  color: #C8102E;
+  border: 2px solid #C8102E;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.jogo-card .btn-cancelar:hover {
+  background: #C8102E;
+  color: #FFFFFF;
+}
+
+.jogos-vazio {
+  background: #FFFFFF;
+  padding: 30px;
+  text-align: center;
+  border-radius: 16px;
+  color: #888;
+  margin-bottom: 20px;
+}
+/* Próximos jogos (mini-lista) */
+.proximo-jogo-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #EEE;
+}
+
+.proximo-jogo-item:last-child {
+  border-bottom: none;
+}
+
+.proximo-jogo-item .proximo-data {
+  font-weight: 700;
+  color: #0A3161;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.proximo-jogo-item .proximo-info {
+  font-size: 14px;
+  color: #666;
+  margin-left: 22px;
+}
+/* Resumo de mensalidade */
+.resumo-valor {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  margin: 8px 0 4px;
+}
+
+.resumo-valor.devendo {
+  color: #C8102E;
+}
+
+.resumo-valor.em-dia {
+  color: #16a34a;
+}
+
+.resumo-texto {
+  text-align: center;
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+/* Histórico de mensalidades */
+.mensalidade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #EEE;
+}
+
+.mensalidade-item:last-child {
+  border-bottom: none;
+}
+
+.mensalidade-mes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #0A3161;
+  font-size: 16px;
+}
+
+.mensalidade-valor {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+  margin-left: 22px;
+}
+
+.mensalidade-status {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.mensalidade-status.pendente {
+  background: #FFE5E5;
+  color: #C8102E;
+}
+
+.mensalidade-status.pago {
+  background: #E5F8E5;
+  color: #16a34a;
+}
+
+/* Mensagens de estado vazio */
+.sem-mensalidade {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+/* Lista de jogadores — Admin */
+.admin-jogador-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #EEE;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.admin-jogador-item:hover {
+  background: #FFF8E1;
+}
+
+.admin-jogador-item:last-child {
+  border-bottom: none;
+}
+
+.admin-jogador-info {
+  flex: 1;
+}
+
+.admin-jogador-nome {
+  font-weight: 700;
+  color: #0A3161;
+  font-size: 16px;
+}
+
+.admin-jogador-status {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.admin-jogador-valor {
+  font-weight: 800;
+  font-size: 17px;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.admin-jogador-valor.devendo {
+  color: #C8102E;
+}
+
+.admin-jogador-valor.em-dia {
+  color: #16a34a;
+}
+
+/* Detalhes do jogador (admin) */
+.admin-detalhe-info {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.admin-detalhe-telefone {
+  color: #666;
+  font-size: 15px;
+  margin-top: 4px;
+}
+/* Botão DAR BAIXA */
+.btn-pagar {
+  background: #16a34a;
+  color: #FFFFFF;
+  border: 0;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-pagar:hover {
+  background: #15803d;
+  transform: scale(1.05);
+}
+
+.btn-pagar:active {
+  transform: scale(0.98);
+}
+/* Aviso de mensalidade pendente (topo da tela) */
+.aviso-pendencia {
+  background: linear-gradient(135deg, #C8102E 0%, #E01135 100%);
+  color: #FFFFFF;
+  padding: 16px 18px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: pulse-aviso 2s ease-in-out infinite;
+}
+
+.aviso-pendencia:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(200, 16, 46, 0.4);
+}
+
+.aviso-pendencia:active {
+  transform: translateY(0);
+}
+
+.aviso-pendencia-icone {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.aviso-pendencia-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aviso-pendencia-texto strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.aviso-pendencia-texto span {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+@keyframes pulse-aviso {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(200, 16, 46, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(200, 16, 46, 0.55);
+  }
+}
+/* Textarea (aviso) */
+.card textarea {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #E0E0E0;
+  border-radius: 14px;
+  background: #FAFAFA;
+  color: #1A1A1A;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+
+.card textarea:focus {
+  outline: none;
+  border-color: #C8102E;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.12);
+}
+
+/* Cards de aviso */
+.aviso-card {
+  background: #FFFFFF;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(10, 49, 97, 0.08);
+  border-left: 5px solid #F4C430;
+}
+
+.aviso-card .aviso-titulo {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0A3161;
+  margin-bottom: 6px;
+}
+
+.aviso-card .aviso-data {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.aviso-card .aviso-mensagem {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.aviso-card .btn-excluir-aviso {
+  margin-top: 12px;
+  background: transparent;
+  color: #C8102E;
+  border: 2px solid #C8102E;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.aviso-card .btn-excluir-aviso:hover {
+  background: #C8102E;
+  color: #FFFFFF;
+}
+
+.sem-avisos {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  background: #FFFFFF;
+  border-radius: 14px;
+}
+/* Textarea (aviso) */
+.card textarea {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #E0E0E0;
+  border-radius: 14px;
+  background: #FAFAFA;
+  color: #1A1A1A;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: all 0.2s;
+}
+
+.card textarea:focus {
+  outline: none;
+  border-color: #C8102E;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.12);
+}
+
+/* Cards de aviso */
+.aviso-card {
+  background: #FFFFFF;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(10, 49, 97, 0.08);
+  border-left: 5px solid #F4C430;
+}
+
+.aviso-card .aviso-titulo {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0A3161;
+  margin-bottom: 6px;
+}
+
+.aviso-card .aviso-data {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.aviso-card .aviso-mensagem {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.aviso-card .btn-excluir-aviso {
+  margin-top: 12px;
+  background: transparent;
+  color: #C8102E;
+  border: 2px solid #C8102E;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.aviso-card .btn-excluir-aviso:hover {
+  background: #C8102E;
+  color: #FFFFFF;
+}
+
+.sem-avisos {
+  text-align: center;
+  padding: 30px;
+  color: #888;
+  background: #FFFFFF;
+  border-radius: 14px;
+}
+/* Admin: linha de jogador na lista de gerenciamento */
+.admin-jogador-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px solid #EEE;
+  gap: 10px;
+}
+
+.admin-jogador-linha:last-child {
+  border-bottom: none;
+}
+
+.admin-jogador-linha.inativo {
+  opacity: 0.55;
+}
+
+.admin-jogador-linha .jog-nome {
+  font-weight: 700;
+  color: #0A3161;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-jogador-linha .jog-detalhe {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.admin-jogador-linha .jog-deve {
+  color: #C8102E;
+  font-weight: 700;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.admin-jogador-linha .jog-acoes {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-mini {
+  background: transparent;
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-mini.editar {
+  color: #0A3161;
+  border-color: #0A3161;
+}
+
+.btn-mini.editar:hover {
+  background: #0A3161;
+  color: #FFFFFF;
+}
+
+.btn-mini.desativar {
+  color: #C8102E;
+  border-color: #C8102E;
+}
+
+.btn-mini.desativar:hover {
+  background: #C8102E;
+  color: #FFFFFF;
+}
+
+.btn-mini.ativar {
+  color: #16a34a;
+  border-color: #16a34a;
+}
+
+.btn-mini.ativar:hover {
+  background: #16a34a;
+  color: #FFFFFF;
+}
+
+/* Badge "Inativo" */
+.badge-inativo {
+  background: #FFE5E5;
+  color: #C8102E;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+/* Escalação */
+.jogador-time-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #EEE;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+}
+
+.jogador-time-item:last-child {
+  border-bottom: none;
+}
+
+.jogador-time-nome {
+  font-weight: 700;
+  color: #0A3161;
+}
+
+.jogador-time-item .tag-time {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.tag-time-A { background: #FFE5E5; color: #C8102E; }
+.tag-time-B { background: #FFF8E1; color: #B8951F; }
+.tag-time-null { background: #EEE; color: #666; }
+
+/* Botões de escolha de time na tela do ADM */
+.btn-time-grupo {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-time-mini {
+  background: transparent;
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn-time-mini.a { color: #C8102E; border-color: #C8102E; }
+.btn-time-mini.a:hover, .btn-time-mini.a.ativo { background: #C8102E; color: #FFF; }
+
+.btn-time-mini.b { color: #B8951F; border-color: #B8951F; }
+.btn-time-mini.b:hover, .btn-time-mini.b.ativo { background: #B8951F; color: #FFF; }
+
+.btn-time-mini.none { color: #666; border-color: #CCC; }
+.btn-time-mini.none:hover, .btn-time-mini.none.ativo { background: #666; color: #FFF; }
+.btn-time-mini.a.ativo { background: #C8102E !important; color: #FFF !important; }
+.btn-time-mini.b.ativo { background: #B8951F !important; color: #FFF !important; }
+.btn-time-mini.none.ativo { background: #666 !important; color: #FFF !important; }
+
+@media (max-width: 500px) {
+  body {
+    font-size: 17px;
+  }
+
+  .container {
+    width: 92%;
+  }
+
+  .boas-vindas h1 {
+    font-size: 26px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .topo strong {
+    font-size: 17px;
+  }
+
+  .topo .icone {
+    width: 38px;
+    height: 38px;
+  }
+
+  .btn-sair {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+/* Cards de resultado */
+.placar-card {
+  background: #FFF;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(10, 49, 97, 0.08);
+  border-left: 5px solid #0A3161;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.placar-info { flex: 1; }
+.placar-data { font-size: 13px; color: #888; text-transform: uppercase; font-weight: bold; }
+.placar-placar { font-size: 26px; font-weight: 900; color: #0A3161; margin-top: 4px; display: flex; align-items: center; gap: 8px;}
+.placar-placar .time-a { color: #C8102E; }
+.placar-placar .time-b { color: #F4C430; text-shadow: 1px 1px 0px #000;}
+.placar-btn { background: #0A3161; color: #FFF; border:0; border-radius:8px; padding:10px 14px; font-weight:bold; cursor:pointer; }
+.placar-btn:hover { background: #C8102E; }

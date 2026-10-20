@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Racha do Campaner</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================================ -->
+  <!-- TELA 1 — LOGIN                               -->
+  <!-- ============================================ -->
+  <section id="telaLogin" class="tela">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>Bem-vindo! 👋</h1>
+        <p>Entre com seu telefone e senha.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>🔐 Entrar</h2>
+
+        <label for="loginTelefone">Telefone</label>
+        <input
+          type="tel"
+          id="loginTelefone"
+          placeholder="Ex: 43998665378"
+          autocomplete="tel"
+        >
+
+        <label for="loginSenha">Senha</label>
+        <input
+          type="password"
+          id="loginSenha"
+          placeholder="Digite sua senha"
+          autocomplete="current-password"
+        >
+
+        <button class="btn btn-principal" onclick="fazerLogin()">
+          ✅ ENTRAR
+        </button>
+
+        <p class="mensagem-erro" id="mensagemLogin"></p>
+
+        <p class="link-alternativo">
+          Primeira vez?
+          <a href="#" onclick="mostrarCadastro(); return false;">Cadastre-se</a>
+        </p>
+      </section>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 2 — CADASTRO                            -->
+  <!-- ============================================ -->
+  <section id="telaCadastro" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>Criar conta 📝</h1>
+        <p>Só uma vez. Depois você entra direto.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>Cadastro</h2>
+
+        <label for="cadNome">Nome completo</label>
+        <input
+          type="text"
+          id="cadNome"
+          placeholder="Como quer ser chamado"
+          autocomplete="name"
+        >
+
+        <label for="cadTelefone">Telefone (só números)</label>
+        <input
+          type="tel"
+          id="cadTelefone"
+          placeholder="Ex: 43998665378"
+          autocomplete="tel"
+        >
+
+        <label for="cadSenha">Senha</label>
+        <input
+          type="password"
+          id="cadSenha"
+          placeholder="Escolha uma senha"
+          autocomplete="new-password"
+        >
+
+        <button class="btn btn-principal" onclick="fazerCadastro()">
+          💾 CRIAR CONTA
+        </button>
+
+        <p class="mensagem-erro" id="mensagemCadastro"></p>
+
+        <p class="link-alternativo">
+          Já tem conta?
+          <a href="#" onclick="mostrarLogin(); return false;">Entrar</a>
+        </p>
+      </section>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 3 — APP PRINCIPAL                       -->
+  <!-- ============================================ -->
+  <section id="telaApp" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <button class="btn-adm" id="btnAdm" onclick="abrirPainelAdm()" style="display:none;">
+          👑 ADM
+        </button>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fazerLogout()" title="Sair">
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>Olá, <span id="nomeUsuarioLogado">...</span>! 👋</h1>
+        <p>Vamos organizar o próximo jogo?</p>
+      </section>
+            <div id="avisoMensalidade" class="aviso-pendencia" style="display:none;" onclick="abrirMensalidade()">
+        <span class="aviso-pendencia-icone">⚠️</span>
+        <div class="aviso-pendencia-texto">
+          <strong id="avisoPendenciaTitulo">Você tem mensalidade pendente!</strong>
+          <span id="avisoPendenciaDetalhe">Clique pra ver detalhes</span>
+        </div>
+      </div>
+
+      <section class="card destaque">
+        <h2>Próximo jogo</h2>
+        <div id="jogo">Carregando...</div>
+
+        <div class="acoes">
+          <button class="btn btn-principal" onclick="registrarPresenca('confirmado')">
+            ✅ VOU JOGAR
+          </button>
+
+          <button class="btn btn-secundario" onclick="registrarPresenca('nao_vai')">
+            ❌ NÃO VOU
+          </button>
+        </div>
+
+        <p id="mensagem" class="mensagem" aria-live="polite"></p>
+      </section>
+
+      <section class="card" id="cardProximosJogos" style="display:none;">
+        <h2>📌 Próximos jogos</h2>
+        <div id="proximosJogos"></div>
+      </section>
+
+      <section class="card">
+        <h2>👥 Jogadores</h2>
+        <div id="jogadores">Carregando...</div>
+      </section>
+
+      <section class="menu-grid">
+        <button class="menu-btn" onclick="abrirEscalacao()">👥<span>Jogadores</span></button>
+        <button class="menu-btn" onclick="abrirMensalidade()">💰<span>Pagamentos</span></button>
+        <button class="menu-btn" onclick="abrirAvisos()">📢<span>Avisos</span></button>
+        <button class="menu-btn" onclick="abrirResultados()">📅<span>Jogos</span></button>
+      </section>
+
+      <p class="aviso-mensalidade">
+        💰 <strong>Mensalidade: R$ 40,00</strong> — fale com o Eduardo para regularizar
+      </p>
+    </main>
+
+    <footer>
+      <p>Projeto de extensão — Futebol da Empresa</p>
+    </footer>
+
+  </section>
+    <!-- ============================================ -->
+  <!-- TELA 10 — AVISOS (todos veem)                -->
+  <!-- ============================================ -->
+  <section id="telaAvisos" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAvisos()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>📢 Avisos</h1>
+        <p>Fiquem atentos aos avisos.</p>
+      </section>
+
+      <div id="listaAvisos">
+        <p>Carregando...</p>
+      </div>
+
+      <button class="btn btn-secundario" onclick="fecharAvisos()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 11 — ADMIN: PUBLICAR AVISO              -->
+  <!-- ============================================ -->
+  <section id="telaAdminAvisos" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAdminAvisos()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>📢 Publicar aviso</h1>
+        <p>Escrever Avisos.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>Novo aviso</h2>
+
+        <label for="avisoTitulo">Título</label>
+        <input
+          type="text"
+          id="avisoTitulo"
+          placeholder="Ex: Jogo de quarta cancelado"
+          maxlength="100"
+        >
+
+        <label for="avisoMensagem">Mensagem</label>
+        <textarea
+          id="avisoMensagem"
+          placeholder="Escreva o recado..."
+          rows="5"
+          maxlength="500"
+        ></textarea>
+
+        <button class="btn btn-principal" onclick="publicarAviso()">
+          📢 PUBLICAR AVISO
+        </button>
+
+        <p class="mensagem-erro" id="mensagemAviso"></p>
+      </section>
+
+      <section class="card">
+        <h2>📋 Avisos publicados</h2>
+        <div id="listaAdminAvisos">Carregando...</div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharAdminAvisos()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+    <!-- TELA 14 — ADMIN: LANÇAR RESULTADO -->
+  <section id="telaAdminResultados" class="tela" style="display:none;">
+    <header class="topo">
+      <div><span class="icone">⚽</span><strong>Racha do Campaner</strong><img src="/img/brasao.jpg" class="brasao-header"><button class="btn-sair" onclick="fecharAdminResultados()">← Voltar</button></div>
+    </header>
+    <main class="container">
+      <section class="boas-vindas"><h1>🏆 Lançar Resultado</h1><p>Escolha um jogo passado para atualizar o placar.</p></section>
+      <div id="listaJogosPassados">Carregando...</div>
+      <button class="btn btn-secundario" onclick="fecharAdminResultados()">← VOLTAR</button>
+    </main>
+  </section>
+
+  <!-- TELA 15 — ADMIN: EDITAR PLACAR -->
+  <section id="telaAdminEditarPlacar" class="tela" style="display:none;">
+    <header class="topo">
+      <div><span class="icone">⚽</span><strong>Racha do Campaner</strong><img src="/img/brasao.jpg" class="brasao-header"><button class="btn-sair" onclick="fecharAdminEditarPlacar()">← Voltar</button></div>
+    </header>
+    <main class="container">
+      <section class="boas-vindas"><h1>✏️ Editar Placar</h1><p id="placarSubtitulo"></p></section>
+      <section class="card destaque">
+        <div style="display:flex; gap:20px; align-items:center; justify-content:center; margin-bottom:20px;">
+          <div style="text-align:center;">
+            <label>Time A</label>
+            <input type="number" id="golsTimeA" min="0" value="0" style="width:80px; text-align:center; font-size:24px; padding:10px;">
+          </div>
+          <span style="font-size:24px; font-weight:bold; color:#0A3161;">X</span>
+          <div style="text-align:center;">
+            <label>Time B</label>
+            <input type="number" id="golsTimeB" min="0" value="0" style="width:80px; text-align:center; font-size:24px; padding:10px;">
+          </div>
+        </div>
+        <button class="btn btn-principal" onclick="salvarPlacar()">💾 SALVAR RESULTADO</button>
+      </section>
+      <button class="btn btn-secundario" onclick="fecharAdminEditarPlacar()">← CANCELAR</button>
+    </main>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 12 — ADMIN: GERENCIAR JOGADORES         -->
+  <!-- ============================================ -->
+  <section id="telaAdminJogadores" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAdminJogadores()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>👥 Gerenciar jogadores</h1>
+        <p>Cadastre, edite e ative/desative a galera.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>➕ Cadastrar novo jogador</h2>
+
+        <label for="novoJogNome">Nome</label>
+        <input type="text" id="novoJogNome" placeholder="Nome completo">
+
+        <label for="novoJogTelefone">Telefone (só números)</label>
+        <input type="tel" id="novoJogTelefone" placeholder="Ex: 43998665378">
+
+        <label for="novoJogSenha">Senha</label>
+        <input type="password" id="novoJogSenha" placeholder="Senha de acesso">
+
+        <button class="btn btn-principal" onclick="cadastrarJogadorAdmin()">
+          💾 CADASTRAR
+        </button>
+
+        <p class="mensagem-erro" id="mensagemNovoJog"></p>
+      </section>
+
+      <section class="card">
+        <h2>📋 Todos os jogadores</h2>
+        <div id="listaAdminJogadores">Carregando...</div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharAdminJogadores()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 13 — ADMIN: EDITAR JOGADOR              -->
+  <!-- ============================================ -->
+  <section id="telaAdminEditarJogador" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAdminEditarJogador()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>✏️ Editar jogador</h1>
+        <p id="adminEditarSubtitulo">...</p>
+      </section>
+
+      <section class="card destaque">
+        <label for="editJogNome">Nome</label>
+        <input type="text" id="editJogNome">
+
+        <label for="editJogTelefone">Telefone</label>
+        <input type="tel" id="editJogTelefone">
+
+        <label for="editJogSenha">Nova senha (deixe vazio pra manter)</label>
+        <input type="password" id="editJogSenha" placeholder="Deixe vazio pra não mudar">
+
+        <button class="btn btn-principal" onclick="salvarEdicaoJogadorAdmin()">
+          💾 SALVAR ALTERAÇÕES
+        </button>
+
+        <p class="mensagem-erro" id="mensagemEditJog"></p>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharAdminEditarJogador()">
+        ← CANCELAR
+      </button>
+    </main>
+
+  </section>
+  <!-- TELA 17 — ESCALAÇÃO (todos veem) -->
+  <section id="telaEscalacao" class="tela" style="display:none;">
+    <header class="topo">
+      <div><span class="icone">⚽</span><strong>Racha do Campaner</strong><img src="/img/brasao.jpg" class="brasao-header"><button class="btn-sair" onclick="fecharEscalacao()">← Voltar</button></div>
+    </header>
+    <main class="container">
+      <section class="boas-vindas"><h1>👥 Escalação</h1><p>Veja quem tá em cada time.</p></section>
+
+      <section class="card destaque" id="cardTimeA">
+        <h2 style="color: #C8102E;">🟥 Time A</h2>
+        <div id="listaTimeA">Carregando...</div>
+      </section>
+
+      <section class="card destaque" style="border-top-color: #F4C430;" id="cardTimeB">
+        <h2 style="color: #B8951F;">🟨 Time B</h2>
+        <div id="listaTimeB">Carregando...</div>
+      </section>
+
+      <section class="card" id="cardAguardando" style="display:none;">
+        <h2>⏳ Aguardando escalação</h2>
+        <div id="listaAguardando"></div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharEscalacao()">← VOLTAR</button>
+    </main>
+  </section>
+
+    <!-- TELA 16 — RESULTADOS (todos veem) -->
+  <section id="telaResultados" class="tela" style="display:none;">
+    <header class="topo">
+      <div><span class="icone">⚽</span><strong>Racha do Campaner</strong><img src="/img/brasao.jpg" class="brasao-header"><button class="btn-sair" onclick="fecharResultados()">← Voltar</button></div>
+    </header>
+    <main class="container">
+      <section class="boas-vindas"><h1>🏆 Últimos Resultados</h1><p>Os 5 últimos jogos do racha.</p></section>
+      <div id="listaResultados">Carregando...</div>
+      <button class="btn btn-secundario" onclick="fecharResultados()">← VOLTAR</button>
+    </main>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 8 — ADMIN: MENSALIDADES                 -->
+  <!-- ============================================ -->
+  <section id="telaAdminMensalidades" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAdminMensalidades()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>💰 Mensalidades</h1>
+        <p>Controle quem esta devendo e quem esta em dia.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>🔄 Gerar cobrança do mês</h2>
+        <p class="dica-data">
+          Cria a mensalidade do mês atual pra todos os jogadores ativos.
+          Só gera uma vez por mês.
+        </p>
+        <button class="btn btn-principal" id="btnGerarMes" onclick="gerarMesAtual()">
+          🔄 GERAR COBRANÇA DO MÊS
+        </button>
+        <p class="mensagem-erro" id="mensagemGerarMes"></p>
+      </section>
+
+      <section class="card">
+        <h2>👥 Jogadores</h2>
+        <div id="listaAdminMensalidades">Carregando...</div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharAdminMensalidades()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+  <!-- ============================================ -->
+  <!-- TELA 18 — TROCAR SENHA                       -->
+  <!-- ============================================ -->
+  <section id="telaTrocarSenha" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharTrocarSenha()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>🔑 Trocar senha</h1>
+        <p>Altere sua senha de acesso.</p>
+      </section>
+
+      <section class="card destaque">
+        <label for="senhaAtual">Senha atual</label>
+        <input type="password" id="senhaAtual" placeholder="Digite sua senha atual">
+
+        <label for="senhaNova">Nova senha</label>
+        <input type="password" id="senhaNova" placeholder="Mínimo 4 caracteres">
+
+        <label for="senhaNovaConfirma">Confirmar nova senha</label>
+        <input type="password" id="senhaNovaConfirma" placeholder="Digite a nova senha de novo">
+
+        <button class="btn btn-principal" onclick="salvarNovaSenha()">
+          💾 SALVAR NOVA SENHA
+        </button>
+
+        <p class="mensagem-erro" id="mensagemTrocarSenha"></p>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharTrocarSenha()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 9 — ADMIN: DETALHE DE JOGADOR           -->
+  <!-- ============================================ -->
+  <section id="telaAdminDetalhe" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharAdminDetalhe()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1 id="adminDetalheNome">...</h1>
+        <p>Acompanhe os pagamentos.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>💰 Situação</h2>
+        <div id="adminDetalheResumo">Carregando...</div>
+      </section>
+
+      <section class="card">
+        <h2>📅 Histórico</h2>
+        <div id="adminDetalheHistorico">Carregando...</div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharAdminDetalhe()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 7 — MINHA MENSALIDADE                   -->
+  <!-- ============================================ -->
+  <section id="telaMensalidade" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharMensalidade()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>💰 Minha mensalidade</h1>
+        <p>Acompanhe seus pagamentos.</p>
+      </section>
+
+      <section class="card destaque" id="resumoMensalidade">
+        <h2>Resumo</h2>
+        <div id="resumoConteudo">Carregando...</div>
+      </section>
+
+      <section class="card">
+        <h2>📅 Histórico</h2>
+        <div id="historicoMensalidade">Carregando...</div>
+      </section>
+
+      <button class="btn btn-secundario" onclick="fecharMensalidade()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 5 — CRIAR JOGO                          -->
+  <!-- ============================================ -->
+  <section id="telaCriarJogo" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharCriarJogo()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>📅 Criar novo jogo</h1>
+        <p>Agende o próximo racha.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>Dados do jogo</h2>
+
+        <label for="jogoData">Data</label>
+        <input type="date" id="jogoData">
+
+        <p class="dica-data">
+          💡 Por padrão, o racha é sempre na <strong>quarta-feira</strong>.
+          Mas você pode escolher outra data se precisar.
+        </p>
+
+        <label for="jogoHorario">Horário</label>
+        <input
+          type="time"
+          id="jogoHorario"
+          value="19:30"
+        >
+
+        <label for="jogoLocal">Local</label>
+        <input
+          type="text"
+          id="jogoLocal"
+          placeholder="Ex: Chácara"
+          value="Chácara"
+        >
+
+        <label for="jogoMinimo">Mínimo de jogadores</label>
+        <input
+          type="number"
+          id="jogoMinimo"
+          placeholder="Ex: 14"
+          value="14"
+          min="1"
+        >
+
+        <button class="btn btn-principal" onclick="salvarJogo()">
+          💾 SALVAR JOGO
+        </button>
+
+        <p class="mensagem-erro" id="mensagemCriarJogo"></p>
+
+        <button class="btn btn-secundario" onclick="fecharCriarJogo()">
+          ← CANCELAR
+        </button>
+      </section>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 6 — LISTAR JOGOS (ADM)                  -->
+  <!-- ============================================ -->
+  <section id="telaListarJogos" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharListarJogos()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>📋 Jogos agendados</h1>
+        <p>Todos os jogos futuros do racha.</p>
+      </section>
+
+      <div id="listaJogos">
+        <p>Carregando...</p>
+      </div>
+
+      <button class="btn btn-secundario" onclick="fecharListarJogos()">
+        ← VOLTAR
+      </button>
+    </main>
+
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TELA 4 — PAINEL DO ADM                       -->
+  <!-- ============================================ -->
+  <section id="telaAdm" class="tela" style="display:none;">
+
+    <header class="topo">
+      <div>
+        <span class="icone">⚽</span>
+        <strong>Racha do Campaner</strong>
+        <img src="/img/brasao.jpg" alt="Brasão Chácara Jr" class="brasao-header">
+        <button class="btn-sair" onclick="fecharPainelAdm()" title="Voltar">
+          ← Voltar
+        </button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="boas-vindas">
+        <h1>👑 Painel do Administrador</h1>
+        <p>Gerencie o racha da galera.</p>
+      </section>
+
+      <section class="card destaque">
+        <h2>O que você quer fazer?</h2>
+
+        <div class="acoes">
+          <button class="btn btn-principal" onclick="abrirCriarJogo()">
+            📅 CRIAR NOVO JOGO
+          </button>
+
+          <button class="btn btn-secundario" onclick="abrirListarJogos()">
+            📋 VER JOGOS AGENDADOS
+          </button>
+
+          <button class="btn btn-secundario" onclick="abrirAdminJogadores()">
+            👥 GERENCIAR JOGADORES
+          </button>
+
+          <button class="btn btn-secundario" onclick="abrirAdminAvisos()">
+            📢 PUBLICAR AVISO
+          </button>
+          
+          <button class="btn btn-secundario" onclick="abrirAdminMensalidades()">
+            💰 VER PAGAMENTOS
+          </button>
+
+          <button class="btn btn-secundario" onclick="abrirAdminResultados()">
+            🏆 LANÇAR RESULTADO
+          </button>
+
+          <button class="btn btn-secundario" onclick="abrirTrocarSenha()">
+            🔑 TROCAR MINHA SENHA
+          </button>
+        </div>
+      </section>
+
+      <footer>
+        <p>Projeto de extensão — Futebol da Empresa</p>
+      </footer>
+    </main>
+
+  </section>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
