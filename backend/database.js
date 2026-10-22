@@ -81,7 +81,7 @@ if (isProduction) {
 } else {
   // ===== DESENVOLVIMENTO (SEU PC + SQLITE) =====
   const Database = require("better-sqlite3");
-  const dbPath = path.join(__dirname, "..", "database", "futebol.db");
+  const dbPath = path.join(__dirname, "database", "futebol.db");
   const db = new Database(dbPath);
   db.pragma("foreign_keys = ON");
 
