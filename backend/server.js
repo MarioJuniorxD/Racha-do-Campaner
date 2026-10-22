@@ -412,6 +412,50 @@ app.put("/api/mensalidades/:id/pagar", async (req, res) => {
     res.json({ sucesso: true });
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
 });
+// =====================================================
+// ROTA: GARANTIR JOGO DA PRÓXIMA QUARTA (AUTOMÁTICO)
+// =====================================================
+
+app.post("/api/garantir-jogo", async (req, res) => {
+  try {
+    // Calcula a próxima quarta-feira
+    const hoje = new Date();
+    const diaDaSemana = hoje.getDay();
+    let diasParaQuarta = (3 - diaDaSemana + 7) % 7;
+    if (diasParaQuarta === 0) diasParaQuarta = 7;
+
+    const proximaQuarta = new Date(hoje);
+    proximaQuarta.setDate(hoje.getDate() + diasParaQuarta);
+    const dataISO = proximaQuarta.toISOString().split("T")[0];
+
+    // Verifica se já tem um jogo pra essa data (ou futuro)
+    const jogoExistente = await db.prepare(`
+      SELECT * FROM jogos 
+      WHERE date(data) >= date('now', 'localtime')
+      ORDER BY data ASC LIMIT 1
+    `).get();
+
+    // Se já tem jogo futuro, não faz nada
+    if (jogoExistente) {
+      return res.json({ sucesso: true, criado: false, jogo: jogoExistente });
+    }
+
+    // Se não tem, cria o jogo da próxima quarta
+    const resultado = await db.prepare(`
+      INSERT INTO jogos (data, horario, local, minimo_jogadores)
+      VALUES (?, ?, ?, ?) RETURNING id
+    `).run(dataISO, "19:30", "Chácara", 14);
+
+    const jogoCriado = await db.prepare("SELECT * FROM jogos WHERE id = ?").get(resultado.lastInsertRowid);
+
+    console.log(`⚽ Jogo automático criado para ${dataISO}`);
+    res.json({ sucesso: true, criado: true, jogo: jogoCriado });
+
+  } catch (erro) {
+    console.error("Erro ao garantir jogo:", erro);
+    res.status(500).json({ erro: "Erro ao criar jogo automático." });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);

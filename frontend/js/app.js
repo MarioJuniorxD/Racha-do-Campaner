@@ -158,6 +158,10 @@ function ehJogoExtra(dataISO) {
 
 async function carregarJogo() {
   try {
+    // Primeiro, garante que o jogo da próxima quarta existe
+    await fetch("/api/garantir-jogo", { method: "POST" });
+
+    // Depois, carrega o jogo normalmente
     const resposta = await fetch("/api/jogo");
     const jogo = await resposta.json();
 
@@ -183,7 +187,6 @@ async function carregarJogo() {
     document.getElementById("jogo").innerHTML = `<p>Erro ao carregar o jogo.</p>`;
   }
 }
-
 async function carregarProximosJogos() {
   const card = document.getElementById("cardProximosJogos");
   const container = document.getElementById("proximosJogos");
