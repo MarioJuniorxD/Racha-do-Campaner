@@ -1,8 +1,9 @@
 // backend/database.js
 const path = require("path");
 
-// Se estiver no Render (produção), usa Postgres. Se estiver no PC, usa SQLite.
 const isProduction = process.env.DATABASE_URL;
+
+let db;
 
 if (isProduction) {
   // ===== PRODUÇÃO (RENDER + POSTGRES) =====
@@ -12,7 +13,11 @@ if (isProduction) {
     ssl: { rejectUnauthorized: false }
   });
 
-  const db = {
+  pool.on('error', (err) => {
+    console.error('❌ Erro no pool do Postgres:', err);
+  });
+
+  db = {
     query: (text, params) => pool.query(text, params),
     prepare: (text) => {
       return {
@@ -25,7 +30,6 @@ if (isProduction) {
           return res.rows;
         },
         run: async (...params) => {
-          // Postgres usa RETURNING id para pegar o ID inserido
           const res = await pool.query(text, params);
           return { changes: res.rowCount, lastInsertRowid: res.rows[0]?.id };
         }
@@ -69,23 +73,26 @@ if (isProduction) {
           criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      console.log("✅ Tabelas Postgres criadas/verificadas.");
+      console.log("✅ Tabelas Postgres criadas/verificadas com sucesso.");
     } catch (err) {
-      console.error("❌ Erro ao criar tabelas:", err);
+      console.error("❌ ERRO AO CRIAR TABELAS:", err);
     }
   };
-  criarTabelas();
 
-  module.exports = db;
+  // Exporta uma Promise que só resolve depois das tabelas serem criadas
+  module.exports = new Promise(async (resolve) => {
+    await criarTabelas();
+    resolve(db);
+  });
 
 } else {
   // ===== DESENVOLVIMENTO (SEU PC + SQLITE) =====
   const Database = require("better-sqlite3");
   const dbPath = path.join(__dirname, "database", "futebol.db");
-  const db = new Database(dbPath);
-  db.pragma("foreign_keys = ON");
+  const dbLocal = new Database(dbPath);
+  dbLocal.pragma("foreign_keys = ON");
 
-  db.exec(`
+  dbLocal.exec(`
     CREATE TABLE IF NOT EXISTS jogadores (
       id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, telefone TEXT NOT NULL UNIQUE,
       senha TEXT NOT NULL, admin INTEGER NOT NULL DEFAULT 0, ativo INTEGER NOT NULL DEFAULT 1,
@@ -120,5 +127,5 @@ if (isProduction) {
     );
   `);
   console.log("✅ Banco SQLite (local) conectado.");
-  module.exports = db;
+  module.exports = Promise.resolve(dbLocal);
 }

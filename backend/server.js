@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcrypt");
-const db = require("./database");
+const dbPromise = require("./database");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,13 +9,22 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "frontend")));
 
+// Variável que vai guardar o banco depois que ele estiver pronto
+let db;
+
 // =====================================================
-// SEED — cria o primeiro ADM se o banco estiver vazio
+// INICIALIZAÇÃO: Espera o banco, cria as tabelas e o Admin
 // =====================================================
-async function verificarSeed() {
+async function iniciarServidor() {
   try {
-    const totalJogadores = await db.prepare("SELECT COUNT(*) AS total FROM jogadores").get();
-    if (Number(totalJogadores.total) === 0) {
+    // 1. Espera o banco de dados (e a criação das tabelas) terminar
+    db = await dbPromise;
+    console.log("✅ Banco de dados conectado e tabelas prontas.");
+
+    // 2. Verifica se o Admin já existe. Se não, cria.
+    const adminExiste = await db.prepare("SELECT id FROM jogadores WHERE telefone = ?").get("43999999999");
+    
+    if (!adminExiste) {
       const nomeAdm = "Eduardo Campaner";
       const telefoneAdm = "43999999999";
       const senhaAdm = "admin123";
@@ -23,18 +32,38 @@ async function verificarSeed() {
       const senhaHash = await bcrypt.hash(senhaAdm, 10);
       await db.prepare("INSERT INTO jogadores (nome, telefone, senha, admin) VALUES (?, ?, ?, 1)").run(nomeAdm, telefoneAdm, senhaHash);
       console.log("👑 Admin criado:", telefoneAdm);
+    } else {
+      console.log("👑 Admin já existe.");
     }
 
+    // 3. Verifica se tem jogo futuro. Se não, cria um pra próxima quarta.
     const totalJogos = await db.prepare("SELECT COUNT(*) AS total FROM jogos").get();
     if (Number(totalJogos.total) === 0) {
-      await db.prepare("INSERT INTO jogos (data, horario, local, minimo_jogadores) VALUES (?, ?, ?, ?)").run("2026-10-21", "19:30", "Chácara", 14);
-      console.log("⚽ Jogo inicial cadastrado.");
+      // Calcula a próxima quarta
+      const hoje = new Date();
+      const diaDaSemana = hoje.getDay();
+      let diasParaQuarta = (3 - diaDaSemana + 7) % 7;
+      if (diasParaQuarta === 0) diasParaQuarta = 7;
+      const proximaQuarta = new Date(hoje);
+      proximaQuarta.setDate(hoje.getDate() + diasParaQuarta);
+      const dataISO = proximaQuarta.toISOString().split("T")[0];
+
+      await db.prepare("INSERT INTO jogos (data, horario, local, minimo_jogadores) VALUES (?, ?, ?, ?)").run(dataISO, "19:30", "Chácara", 14);
+      console.log("⚽ Jogo inicial cadastrado para:", dataISO);
     }
+
+    // 4. Só agora o servidor começa a ouvir as requisições
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+    });
+
   } catch (err) {
-    console.error("Erro no seed:", err);
+    console.error("❌ Erro fatal na inicialização:", err);
+    process.exit(1); // Fecha o processo se o banco falhar
   }
 }
-verificarSeed();
+
+iniciarServidor();
 
 // =====================================================
 // ROTAS DE AUTENTICAÇÃO
@@ -55,7 +84,7 @@ app.post("/api/cadastro", async (req, res) => {
 
     res.json({ sucesso: true, jogador: { id: resultado.lastInsertRowid, nome: nome.trim(), telefone: telefoneLimpo, admin: false } });
   } catch (erro) {
-    console.error(erro);
+    console.error("❌ ERRO NO CADASTRO:", erro);
     res.status(500).json({ erro: "Não foi possível cadastrar." });
   }
 });
@@ -74,7 +103,7 @@ app.post("/api/login", async (req, res) => {
 
     res.json({ sucesso: true, jogador: { id: jogador.id, nome: jogador.nome, telefone: jogador.telefone, admin: jogador.admin === 1 } });
   } catch (erro) {
-    console.error(erro);
+    console.error("❌ ERRO NO LOGIN:", erro);
     res.status(500).json({ erro: "Erro no servidor." });
   }
 });
@@ -95,7 +124,7 @@ app.put("/api/trocar-senha", async (req, res) => {
     await db.prepare("UPDATE jogadores SET senha = ? WHERE id = ?").run(senhaHash, Number(jogadorId));
     res.json({ sucesso: true, mensagem: "Senha alterada com sucesso!" });
   } catch (erro) {
-    console.error(erro);
+    console.error("❌ ERRO AO TROCAR SENHA:", erro);
     res.status(500).json({ erro: "Não foi possível alterar a senha." });
   }
 });
@@ -410,13 +439,12 @@ app.put("/api/mensalidades/:id/pagar", async (req, res) => {
     res.json({ sucesso: true });
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
 });
+
 // =====================================================
 // ROTA: GARANTIR JOGO DA PRÓXIMA QUARTA (AUTOMÁTICO)
 // =====================================================
-
 app.post("/api/garantir-jogo", async (req, res) => {
   try {
-    // Calcula a próxima quarta-feira
     const hoje = new Date();
     const diaDaSemana = hoje.getDay();
     let diasParaQuarta = (3 - diaDaSemana + 7) % 7;
@@ -426,19 +454,16 @@ app.post("/api/garantir-jogo", async (req, res) => {
     proximaQuarta.setDate(hoje.getDate() + diasParaQuarta);
     const dataISO = proximaQuarta.toISOString().split("T")[0];
 
-    // Verifica se já tem um jogo pra essa data (ou futuro)
     const jogoExistente = await db.prepare(`
       SELECT * FROM jogos 
       WHERE data >= CURRENT_DATE
       ORDER BY data ASC LIMIT 1
     `).get();
 
-    // Se já tem jogo futuro, não faz nada
     if (jogoExistente) {
       return res.json({ sucesso: true, criado: false, jogo: jogoExistente });
     }
 
-    // Se não tem, cria o jogo da próxima quarta
     const resultado = await db.prepare(`
       INSERT INTO jogos (data, horario, local, minimo_jogadores)
       VALUES (?, ?, ?, ?) RETURNING id
@@ -453,8 +478,4 @@ app.post("/api/garantir-jogo", async (req, res) => {
     console.error("Erro ao garantir jogo:", erro);
     res.status(500).json({ erro: "Erro ao criar jogo automático." });
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });
