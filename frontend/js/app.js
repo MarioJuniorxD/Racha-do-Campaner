@@ -16,7 +16,6 @@ function lerSessao() {
     return null;
   }
 }
-
 function limparSessao() {
   localStorage.removeItem(CHAVE_SESSAO);
 }
