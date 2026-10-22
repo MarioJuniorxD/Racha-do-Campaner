@@ -16,9 +16,9 @@ async function verificarSeed() {
   try {
     const totalJogadores = await db.prepare("SELECT COUNT(*) AS total FROM jogadores").get();
     if (Number(totalJogadores.total) === 0) {
-      const nomeAdm = "Eduardo Campaner"; // <-- MUDE AQUI
-      const telefoneAdm = "43999999999";  // <-- MUDE AQUI
-      const senhaAdm = "admin123";        // <-- MUDE AQUI
+      const nomeAdm = "Eduardo Campaner";
+      const telefoneAdm = "43999999999";
+      const senhaAdm = "admin123";
       
       const senhaHash = await bcrypt.hash(senhaAdm, 10);
       await db.prepare("INSERT INTO jogadores (nome, telefone, senha, admin) VALUES (?, ?, ?, 1)").run(nomeAdm, telefoneAdm, senhaHash);
@@ -105,7 +105,7 @@ app.put("/api/trocar-senha", async (req, res) => {
 // =====================================================
 app.get("/api/jogo", async (req, res) => {
   try {
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE date(data) >= date('now', 'localtime') ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     if (!jogo) return res.status(404).json({ erro: "Nenhum jogo futuro." });
     res.json(jogo);
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
@@ -113,7 +113,7 @@ app.get("/api/jogo", async (req, res) => {
 
 app.get("/api/proximos-jogos", async (req, res) => {
   try {
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE date(data) >= date('now', 'localtime') ORDER BY data ASC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos.slice(1));
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
 });
@@ -123,7 +123,7 @@ app.get("/api/proximos-jogos", async (req, res) => {
 // =====================================================
 app.get("/api/jogadores", async (req, res) => {
   try {
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE date(data) >= date('now', 'localtime') ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     const jogadores = await db.prepare(`
       SELECT j.id, j.nome, COALESCE(p.status, 'pendente') AS status
       FROM jogadores j LEFT JOIN presencas p ON p.jogador_id = j.id AND p.jogo_id = ?
@@ -141,10 +141,9 @@ app.post("/api/presenca", async (req, res) => {
     const jogador = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND ativo = 1").get(Number(jogadorId));
     if (!jogador) return res.status(404).json({ erro: "Jogador não encontrado." });
 
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE date(data) >= date('now', 'localtime') ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     if (!jogo) return res.status(404).json({ erro: "Nenhum jogo futuro." });
 
-    // Postgres usa ON CONFLICT igual o SQLite
     await db.prepare(`
       INSERT INTO presencas (jogador_id, jogo_id, status) VALUES (?, ?, ?)
       ON CONFLICT(jogador_id, jogo_id) DO UPDATE SET status = excluded.status, atualizado_em = CURRENT_TIMESTAMP
@@ -173,7 +172,7 @@ app.get("/api/jogos/:jogadorId", async (req, res) => {
   try {
     const admin = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND admin = 1").get(Number(req.params.jogadorId));
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE date(data) >= date('now', 'localtime') ORDER BY data ASC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos);
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
 });
@@ -195,7 +194,7 @@ app.get("/api/admin/jogos-passados/:adminId", async (req, res) => {
   try {
     const admin = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND admin = 1").get(Number(req.params.adminId));
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE date(data) < date('now', 'localtime') ORDER BY data DESC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data < CURRENT_DATE ORDER BY data DESC").all();
     res.json(jogos);
   } catch (erro) { res.status(500).json({ erro: "Erro." }); }
 });
@@ -347,8 +346,8 @@ app.post("/api/admin/gerar-mes", async (req, res) => {
 
     const jogadores = await db.prepare(`
       SELECT * FROM jogadores WHERE ativo = 1 
-      AND (strftime('%Y', criado_em) < ? OR (strftime('%Y', criado_em) = ? AND strftime('%m', criado_em) < ?))
-    `).all(String(anoAtual), String(anoAtual), String(mesAtual).padStart(2, "0"));
+      AND (EXTRACT(YEAR FROM criado_em) < ? OR (EXTRACT(YEAR FROM criado_em) = ? AND EXTRACT(MONTH FROM criado_em) < ?))
+    `).all(anoAtual, anoAtual, mesAtual);
 
     for (let j of jogadores) {
       await db.prepare("INSERT INTO mensalidades (jogador_id, mes, ano, valor, status) VALUES (?, ?, ?, 40, 'pendente')").run(j.id, mesAtual, anoAtual);
@@ -430,7 +429,7 @@ app.post("/api/garantir-jogo", async (req, res) => {
     // Verifica se já tem um jogo pra essa data (ou futuro)
     const jogoExistente = await db.prepare(`
       SELECT * FROM jogos 
-      WHERE date(data) >= date('now', 'localtime')
+      WHERE data >= CURRENT_DATE
       ORDER BY data ASC LIMIT 1
     `).get();
 
