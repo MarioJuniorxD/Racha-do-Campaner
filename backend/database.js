@@ -1,4 +1,3 @@
-// backend/database.js
 const path = require("path");
 
 const isProduction = process.env.DATABASE_URL;
@@ -20,17 +19,21 @@ if (isProduction) {
   db = {
     query: (text, params) => pool.query(text, params),
     prepare: (text) => {
+      // Substitui ? por $1, $2, $3... de forma automática
+      let index = 0;
+      const query = text.replace(/\?/g, () => `$${++index}`);
+
       return {
         get: async (...params) => {
-          const res = await pool.query(text, params);
+          const res = await pool.query(query, params);
           return res.rows[0];
         },
         all: async (...params) => {
-          const res = await pool.query(text, params);
+          const res = await pool.query(query, params);
           return res.rows;
         },
         run: async (...params) => {
-          const res = await pool.query(text, params);
+          const res = await pool.query(query, params);
           return { changes: res.rowCount, lastInsertRowid: res.rows[0]?.id };
         }
       };

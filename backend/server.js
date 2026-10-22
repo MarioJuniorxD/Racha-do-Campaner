@@ -22,7 +22,7 @@ async function iniciarServidor() {
     console.log("✅ Banco de dados conectado e tabelas prontas.");
 
     // 2. Verifica se o Admin já existe. Se não, cria.
-    const adminExiste = await db.prepare("SELECT id FROM jogadores WHERE telefone = ?").get("43999999999");
+    const adminExiste = await db.prepare("SELECT id FROM jogadores WHERE telefone = $1").get("43999999999");
     
     if (!adminExiste) {
       const nomeAdm = "Eduardo Campaner";
