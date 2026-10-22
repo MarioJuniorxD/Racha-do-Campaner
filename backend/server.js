@@ -9,19 +9,16 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "frontend")));
 
-// Variável que vai guardar o banco depois que ele estiver pronto
 let db;
 
 // =====================================================
-// INICIALIZAÇÃO: Espera o banco, cria as tabelas e o Admin
+// INICIALIZAÇÃO
 // =====================================================
 async function iniciarServidor() {
   try {
-    // 1. Espera o banco de dados (e a criação das tabelas) terminar
     db = await dbPromise;
     console.log("✅ Banco de dados conectado e tabelas prontas.");
 
-    // 2. Verifica se o Admin já existe. Se não, cria.
     const adminExiste = await db.prepare("SELECT id FROM jogadores WHERE telefone = $1").get("43999999999");
     
     if (!adminExiste) {
@@ -36,10 +33,8 @@ async function iniciarServidor() {
       console.log("👑 Admin já existe.");
     }
 
-    // 3. Verifica se tem jogo futuro. Se não, cria um pra próxima quarta.
     const totalJogos = await db.prepare("SELECT COUNT(*) AS total FROM jogos").get();
     if (Number(totalJogos.total) === 0) {
-      // Calcula a próxima quarta
       const hoje = new Date();
       const diaDaSemana = hoje.getDay();
       let diasParaQuarta = (3 - diaDaSemana + 7) % 7;
@@ -52,14 +47,13 @@ async function iniciarServidor() {
       console.log("⚽ Jogo inicial cadastrado para:", dataISO);
     }
 
-    // 4. Só agora o servidor começa a ouvir as requisições
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
     });
 
   } catch (err) {
     console.error("❌ Erro fatal na inicialização:", err);
-    process.exit(1); // Fecha o processo se o banco falhar
+    process.exit(1);
   }
 }
 
@@ -137,14 +131,20 @@ app.get("/api/jogo", async (req, res) => {
     const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     if (!jogo) return res.status(404).json({ erro: "Nenhum jogo futuro." });
     res.json(jogo);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/jogo:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/proximos-jogos", async (req, res) => {
   try {
     const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos.slice(1));
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/proximos-jogos:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -159,7 +159,10 @@ app.get("/api/jogadores", async (req, res) => {
       WHERE j.ativo = 1 ORDER BY j.nome
     `).all(jogo ? jogo.id : null);
     res.json(jogadores);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/jogadores:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.post("/api/presenca", async (req, res) => {
@@ -179,7 +182,10 @@ app.post("/api/presenca", async (req, res) => {
     `).run(jogador.id, jogo.id, status);
 
     res.json({ id: jogador.id, nome: jogador.nome, status });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/presenca:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -194,7 +200,10 @@ app.post("/api/jogos", async (req, res) => {
 
     await db.prepare("INSERT INTO jogos (data, horario, local, minimo_jogadores) VALUES (?, ?, ?, ?)").run(data, horario, local.trim(), Number(minimo_jogadores) || 14);
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro ao criar." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/jogos (POST):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/jogos/:jogadorId", async (req, res) => {
@@ -203,7 +212,10 @@ app.get("/api/jogos/:jogadorId", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/jogos/:jogadorId:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.delete("/api/jogos/:id", async (req, res) => {
@@ -213,7 +225,10 @@ app.delete("/api/jogos/:id", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("DELETE FROM jogos WHERE id = ?").run(Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/jogos/:id (DELETE):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -225,7 +240,10 @@ app.get("/api/admin/jogos-passados/:adminId", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     const jogos = await db.prepare("SELECT * FROM jogos WHERE data < CURRENT_DATE ORDER BY data DESC").all();
     res.json(jogos);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogos-passados:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.put("/api/admin/jogos/:id/resultado", async (req, res) => {
@@ -235,14 +253,20 @@ app.put("/api/admin/jogos/:id/resultado", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("UPDATE jogos SET gols_time_a = ?, gols_time_b = ? WHERE id = ?").run(Number(gols_time_a), Number(gols_time_b), Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogos/:id/resultado:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/resultados", async (req, res) => {
   try {
     const jogos = await db.prepare("SELECT * FROM jogos WHERE gols_time_a IS NOT NULL AND gols_time_b IS NOT NULL ORDER BY data DESC LIMIT 5").all();
     res.json(jogos);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/resultados:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -262,7 +286,10 @@ app.get("/api/admin/jogadores/:adminId", async (req, res) => {
       ORDER BY j.ativo DESC, j.nome ASC
     `).all();
     res.json(jogadores);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogadores:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.post("/api/admin/jogadores", async (req, res) => {
@@ -276,7 +303,10 @@ app.post("/api/admin/jogadores", async (req, res) => {
     
     await db.prepare("INSERT INTO jogadores (nome, telefone, senha, admin) VALUES (?, ?, ?, 0)").run(nome.trim(), telefoneLimpo, senhaHash);
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogadores (POST):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.put("/api/admin/jogadores/:id", async (req, res) => {
@@ -293,7 +323,10 @@ app.put("/api/admin/jogadores/:id", async (req, res) => {
       await db.prepare("UPDATE jogadores SET nome = ?, telefone = ? WHERE id = ?").run(nome.trim(), telefoneLimpo, Number(req.params.id));
     }
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogadores/:id (PUT):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.put("/api/admin/jogadores/:id/ativo", async (req, res) => {
@@ -303,7 +336,10 @@ app.put("/api/admin/jogadores/:id/ativo", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("UPDATE jogadores SET ativo = ? WHERE id = ?").run(ativo ? 1 : 0, Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogadores/:id/ativo:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.put("/api/admin/jogadores/:id/time", async (req, res) => {
@@ -313,7 +349,10 @@ app.put("/api/admin/jogadores/:id/time", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("UPDATE jogadores SET time = ? WHERE id = ?").run(time, Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/jogadores/:id/time:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/times", async (req, res) => {
@@ -324,7 +363,10 @@ app.get("/api/times", async (req, res) => {
       timeB: jogadores.filter(j => j.time === "B"),
       aguardando: jogadores.filter(j => !j.time)
     });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/times:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -334,7 +376,10 @@ app.get("/api/avisos", async (req, res) => {
   try {
     const avisos = await db.prepare("SELECT * FROM avisos ORDER BY criado_em DESC").all();
     res.json(avisos);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/avisos (GET):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.post("/api/avisos", async (req, res) => {
@@ -344,7 +389,10 @@ app.post("/api/avisos", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("INSERT INTO avisos (titulo, mensagem) VALUES (?, ?)").run(titulo.trim(), mensagem.trim());
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/avisos (POST):", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.delete("/api/avisos/:id", async (req, res) => {
@@ -354,7 +402,10 @@ app.delete("/api/avisos/:id", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("DELETE FROM avisos WHERE id = ?").run(Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/avisos/:id:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
@@ -384,7 +435,10 @@ app.post("/api/admin/gerar-mes", async (req, res) => {
     await db.prepare("INSERT INTO controle_mensalidade (mes, ano, valor_padrao) VALUES (?, ?, 40)").run(mesAtual, anoAtual);
 
     res.json({ sucesso: true, gerado: true, quantidade: jogadores.length, mes: mesAtual, ano: anoAtual });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/gerar-mes:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/mensalidades/:jogadorId", async (req, res) => {
@@ -400,7 +454,10 @@ app.get("/api/mensalidades/:jogadorId", async (req, res) => {
       mensalidades, totalDevido: pendentes.reduce((s, m) => s + m.valor, 0),
       mesesPendentes: pendentes.length
     });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/mensalidades/:jogadorId:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/admin/mensalidades/:adminId", async (req, res) => {
@@ -416,7 +473,10 @@ app.get("/api/admin/mensalidades/:adminId", async (req, res) => {
       WHERE j.ativo = 1 GROUP BY j.id, j.nome, j.telefone, j.ativo ORDER BY total_devido DESC, j.nome ASC
     `).all();
     res.json(jogadores);
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/mensalidades:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.get("/api/admin/mensalidades/:adminId/jogador/:jogadorId", async (req, res) => {
@@ -427,7 +487,10 @@ app.get("/api/admin/mensalidades/:adminId/jogador/:jogadorId", async (req, res) 
     const jogador = await db.prepare("SELECT id, nome, telefone FROM jogadores WHERE id = ?").get(Number(req.params.jogadorId));
     const mensalidades = await db.prepare("SELECT * FROM mensalidades WHERE jogador_id = ? ORDER BY ano DESC, mes DESC").all(Number(req.params.jogadorId));
     res.json({ jogador, mensalidades });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/admin/mensalidades/:adminId/jogador/:jogadorId:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 app.put("/api/mensalidades/:id/pagar", async (req, res) => {
@@ -437,7 +500,10 @@ app.put("/api/mensalidades/:id/pagar", async (req, res) => {
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
     await db.prepare("UPDATE mensalidades SET status = 'pago', data_pagamento = CURRENT_TIMESTAMP WHERE id = ?").run(Number(req.params.id));
     res.json({ sucesso: true });
-  } catch (erro) { res.status(500).json({ erro: "Erro." }); }
+  } catch (erro) { 
+    console.error("❌ ERRO NA ROTA /api/mensalidades/:id/pagar:", erro);
+    res.status(500).json({ erro: "Erro." }); 
+  }
 });
 
 // =====================================================
