@@ -128,7 +128,7 @@ app.put("/api/trocar-senha", async (req, res) => {
 // =====================================================
 app.get("/api/jogo", async (req, res) => {
   try {
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data::date >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     if (!jogo) return res.status(404).json({ erro: "Nenhum jogo futuro." });
     res.json(jogo);
   } catch (erro) { 
@@ -139,7 +139,7 @@ app.get("/api/jogo", async (req, res) => {
 
 app.get("/api/proximos-jogos", async (req, res) => {
   try {
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data::date >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos.slice(1));
   } catch (erro) { 
     console.error("❌ ERRO NA ROTA /api/proximos-jogos:", erro);
@@ -152,7 +152,7 @@ app.get("/api/proximos-jogos", async (req, res) => {
 // =====================================================
 app.get("/api/jogadores", async (req, res) => {
   try {
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data::date >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     const jogadores = await db.prepare(`
       SELECT j.id, j.nome, COALESCE(p.status, 'pendente') AS status
       FROM jogadores j LEFT JOIN presencas p ON p.jogador_id = j.id AND p.jogo_id = ?
@@ -173,7 +173,7 @@ app.post("/api/presenca", async (req, res) => {
     const jogador = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND ativo = 1").get(Number(jogadorId));
     if (!jogador) return res.status(404).json({ erro: "Jogador não encontrado." });
 
-    const jogo = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
+    const jogo = await db.prepare("SELECT * FROM jogos WHERE data::date >= CURRENT_DATE ORDER BY data ASC LIMIT 1").get();
     if (!jogo) return res.status(404).json({ erro: "Nenhum jogo futuro." });
 
     await db.prepare(`
@@ -210,7 +210,7 @@ app.get("/api/jogos/:jogadorId", async (req, res) => {
   try {
     const admin = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND admin = 1").get(Number(req.params.jogadorId));
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE data >= CURRENT_DATE ORDER BY data ASC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data::date >= CURRENT_DATE ORDER BY data ASC").all();
     res.json(jogos);
   } catch (erro) { 
     console.error("❌ ERRO NA ROTA /api/jogos/:jogadorId:", erro);
@@ -238,7 +238,7 @@ app.get("/api/admin/jogos-passados/:adminId", async (req, res) => {
   try {
     const admin = await db.prepare("SELECT * FROM jogadores WHERE id = ? AND admin = 1").get(Number(req.params.adminId));
     if (!admin) return res.status(403).json({ erro: "Apenas admin." });
-    const jogos = await db.prepare("SELECT * FROM jogos WHERE data < CURRENT_DATE ORDER BY data DESC").all();
+    const jogos = await db.prepare("SELECT * FROM jogos WHERE data::date < CURRENT_DATE ORDER BY data DESC").all();
     res.json(jogos);
   } catch (erro) { 
     console.error("❌ ERRO NA ROTA /api/admin/jogos-passados:", erro);
@@ -522,7 +522,7 @@ app.post("/api/garantir-jogo", async (req, res) => {
 
     const jogoExistente = await db.prepare(`
       SELECT * FROM jogos 
-      WHERE data >= CURRENT_DATE
+      WHERE data::date >= CURRENT_DATE
       ORDER BY data ASC LIMIT 1
     `).get();
 
